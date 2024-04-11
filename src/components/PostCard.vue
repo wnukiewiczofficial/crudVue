@@ -8,7 +8,7 @@
   >
     <v-card-actions>
       <v-spacer />
-      <v-btn> Delete </v-btn>
+      <v-btn @click="deleteFunc(id)"> Delete </v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -17,8 +17,10 @@
 export default {
   name: "PostCard",
   props: {
+    id: Number,
     title: String,
     content: String,
+    deleteFunc: Function,
   },
 };
 </script>
