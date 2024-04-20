@@ -10,67 +10,54 @@
         :title="post.title"
         :content="post.content"
         :deleteFunc="deletePost"
+        @postDeleted="getPosts"
       />
     </div>
   </main>
   <main class="d-flex flex-column pa-6 ga-6" v-if="isAdding">
-    <v-sheet class="mx-auto" width="300">
-      <v-form fast-fail @submit.prevent>
-        <v-text-field
-          :rules="generalRules"
-          v-model="titleForm"
-          label="Title"
-        ></v-text-field>
-        <v-text-field
-          :rules="generalRules"
-          v-model="contentForm"
-          label="Content"
-        ></v-text-field>
-        <v-btn
-          class="mt-2"
-          block
-          @click="
-            () => {
-              isAdding = false;
-              addPost(titleForm, contentForm);
-            }
-          "
-          >Add</v-btn
-        >
-      </v-form>
-    </v-sheet>
+    <PostAddForm
+      :isAdding="isAdding"
+      @postAdded="
+        () => {
+          isAdding = false;
+          getPosts();
+        }
+      "
+    />
   </main>
 </template>
 
 <script>
+import axios from "axios";
+import PostAddForm from "./components/PostAddForm.vue";
 import PostCard from "./components/PostCard.vue";
+
 export default {
   name: "App",
-  components: { PostCard },
+  components: { PostCard, PostAddForm },
   data() {
     return {
-      posts: [{ id: 0, title: "Title", content: "Content text" }],
+      // posts: [{ id: 0, title: "Title", content: "Content text" }],
+      posts: [],
       isAdding: false,
-      titleForm: "",
-      contentForm: "",
-      generalRules: [
-        (value) => {
-          if (value != "") return true;
-          return "Please input some text";
-        },
-      ],
     };
   },
   methods: {
-    addPost(title, content) {
-      this.posts.push({ id: this.posts.length, title, content });
-    },
-    deletePost(id) {
-      this.posts = this.posts.filter((user) => user.id !== id);
+    async getPosts() {
+      try {
+        const response = await axios.post(
+          "http://localhost/api/crudVue/getPosts.php",
+          {}
+        );
+        console.log(response.data);
+        this.posts = response.data;
+      } catch (error) {
+        console.error(error);
+      }
     },
   },
   mounted() {
-    this.addPost("Siema", "Pedaly");
+    this.getPosts();
   },
 };
 </script>
